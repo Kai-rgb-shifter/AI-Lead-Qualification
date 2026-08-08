@@ -6,6 +6,7 @@ The system evaluates sales leads using a hybrid scoring approach that combines d
 
 
 
+```markdown
 ## 🚀 Quick Start
 
 ### 1. Install dependencies
@@ -125,10 +126,10 @@ n8n then automates downstream actions such as:
 | Database | SQLite |
 | Automation | n8n |
 | Visualization | Plotly |
-| Data Processing | Pandas |
+| HTTP / API Integration | Requests |
+| Configuration | python-dotenv |
 | Notifications | Gmail |
-| Lead Storage | Google Sheets |
-
+| Lead Logging | Google Sheets |
 
 ## 📸 Screenshots
 
