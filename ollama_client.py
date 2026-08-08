@@ -36,20 +36,50 @@ def _normalize_text(value: Any) -> str:
 
 def _build_prompt(lead: LeadPayload) -> str:
     return (
-        "You are a lead qualification assistant. Do NOT calculate score or category. "
-        "Review the lead information and return ONLY valid JSON with this exact structure: "
-        "{\"reason\":\"\",\"next_action\":\"\",\"risks\":\"\"}. "
-        "Keep all values concise and actionable. Do not include markdown, code fences, or extra text.\n\n"
+        "You are an expert B2B sales qualification assistant. "
+        "Analyze the lead information provided below.\n\n"
+
+        "The lead score and category have already been calculated by our "
+        "scoring system. DO NOT change, recalculate, or question the score "
+        "or category.\n\n"
+
+        "Return ONLY valid JSON using exactly this structure:\n"
+        "{\"reason\":\"\",\"next_action\":\"\",\"risks\":\"\"}\n\n"
+
+        "IMPORTANT RULES:\n"
+        "1. Make every response specific to this lead.\n"
+        "2. Do not give generic advice about lead scoring.\n"
+        "3. Explain WHY the existing score and category make sense.\n"
+        "4. Mention both positive buying signals and any factors limiting "
+        "the lead from being classified higher.\n"
+        "5. Do not invent information that is not provided.\n"
+        "6. Do not assume that a budget is too low unless the provided "
+        "information supports that conclusion.\n"
+        "7. Risks must be based on actual missing information, uncertainty, "
+        "or potential obstacles in the provided lead data.\n"
+        "8. If there is no obvious major risk, say: "
+        "\"No major risk identified; confirm requirements during discovery.\"\n"
+        "9. Give ONE clear and practical next sales action.\n"
+        "10. Do not mention that you are an AI.\n"
+        "11. Do not use markdown or code fences.\n\n"
+
         f"Score: {lead.score}\n"
         f"Category: {lead.category}\n"
-        f"Budget: {lead.budget or 'Not provided'}\n"
-        f"Timeline: {lead.timeline or 'Not provided'}\n"
-        f"Requirement: {lead.requirement or 'Not provided'}\n"
         f"Company: {lead.company or 'Not provided'}\n"
         f"Industry: {lead.industry or 'Not provided'}\n"
         f"Company Size: {lead.company_size or 'Not provided'}\n"
-    )
+        f"Budget: {lead.budget or 'Not provided'}\n"
+        f"Timeline: {lead.timeline or 'Not provided'}\n"
+        f"Requirement: {lead.requirement or 'Not provided'}\n\n"
 
+        "FIELD REQUIREMENTS:\n"
+        "- reason: In 1-3 sentences, explain the strongest buying "
+        "signals and the main reason the lead is in its current category.\n"
+        "- next_action: Give one specific action the salesperson should "
+        "take next, based on the lead's timeline and requirement.\n"
+        "- risks: Identify the most important supported uncertainty or "
+        "obstacle. Never invent a risk."
+    )
 
 def _extract_json_object(text: str) -> Dict[str, Any]:
     candidate = text.strip()

@@ -152,21 +152,7 @@ def main() -> None:
                     }
                 )
 
-                st.markdown("### Analysis Result")
-                st.markdown("#### AI Lead Score")
-                st.markdown(f"## {deterministic_analysis['score']}")
-
-                st.markdown("#### Category")
-                st.markdown(f"## {deterministic_analysis['category']}")
-
-                st.markdown("#### Reason")
-                st.write(ai_analysis["reason"])
-
-                st.markdown("#### Next Action")
-                st.write(ai_analysis["next_action"])
-
-                st.markdown("#### Potential Risks")
-                st.write(ai_analysis["risks"])
+              
 
                 save_lead(
                     {
