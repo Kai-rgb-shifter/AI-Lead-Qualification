@@ -152,8 +152,6 @@ def main() -> None:
                     }
                 )
 
-              
-
                 save_lead(
                     {
                         "name": name,
@@ -187,12 +185,40 @@ def main() -> None:
                         "risks": ai_analysis["risks"],
                     }
                 )
+
+                st.markdown("## Lead Analysis Result")
+
+                score_col, category_col = st.columns(2)
+
+                with score_col:
+                    st.metric("AI Lead Score", deterministic_analysis["score"])
+
+                with category_col:
+                    category = deterministic_analysis["category"]
+                    st.metric("Category", category)
+
+                if category == "Hot":
+                    st.error("🔥 High-priority lead")
+                elif category == "Warm":
+                    st.warning("🟡 Follow-up lead")
+                else:
+                    st.info("🔵 Lower-priority lead")
+
+                st.markdown("### Reason")
+                st.write(ai_analysis["reason"])
+
+                st.markdown("### Next Action")
+                st.write(ai_analysis["next_action"])
+
+                st.markdown("### Potential Risks")
+                st.write(ai_analysis["risks"])
+
                 st.success("Lead saved successfully.")
-            except OllamaClientError as error:
+
+            except OllamaClientError:
                 st.error(
                     "Ollama is not available right now. Make sure the local server is running at http://localhost:11434 and the qwen2.5:3b model is installed."
                 )
-                st.caption(str(error))
 
     with right_col:
         st.markdown("### What the system checks")
@@ -294,7 +320,7 @@ def render_dashboard() -> None:
     render_dashboard_charts(leads)
 
     st.markdown("### Search & Filters")
-    filter_col_1, filter_col_2, filter_col_3 = st.columns([2, 2, 1])
+    filter_col_1, filter_col_2, filter_col_3, filter_col_4 = st.columns([2, 2, 1, 1])
 
     search_query = filter_col_1.text_input(
         "Search by name or company",
@@ -312,6 +338,10 @@ def render_dashboard() -> None:
         value=0,
         step=1,
     )
+    sort_option = filter_col_4.selectbox(
+    "Sort by",
+    ["Highest Score", "Lowest Score", "Newest"],
+)
 
     filtered_leads = []
     search_term = search_query.strip().lower()
@@ -329,16 +359,23 @@ def render_dashboard() -> None:
             continue
 
         filtered_leads.append(
-            {
-                "Name": lead_name,
-                "Company": lead_company,
-                "Industry": str(lead.get("industry", "")).strip(),
-                "Budget": str(lead.get("budget", "")).strip(),
-                "Timeline": str(lead.get("timeline", "")).strip(),
-                "Score": lead_score,
-                "Category": lead_category,
-            }
-        )
+    {
+        "Name": lead_name,
+        "Company": lead_company,
+        "Industry": str(lead.get("industry", "")).strip(),
+        "Budget": str(lead.get("budget", "")).strip(),
+        "Timeline": str(lead.get("timeline", "")).strip(),
+        "Score": lead_score,
+        "Category": lead_category,
+        "Reason": str(lead.get("reason", "")).strip(),
+        "Next Action": str(lead.get("next_action", "")).strip(),
+        "Risks": str(lead.get("risks", "")).strip(),
+    }
+)
+        if sort_option == "Highest Score":
+         filtered_leads.sort(key=lambda lead: lead["Score"], reverse=True)
+        elif sort_option == "Lowest Score":
+         filtered_leads.sort(key=lambda lead: lead["Score"])
 
     st.dataframe(filtered_leads, use_container_width=True, hide_index=True)
 
@@ -346,7 +383,13 @@ def render_dashboard() -> None:
     csv_columns = ["Name", "Company", "Industry", "Budget", "Timeline", "Score", "Category"]
     writer = csv.DictWriter(csv_buffer, fieldnames=csv_columns)
     writer.writeheader()
-    writer.writerows(filtered_leads)
+    writer.writerows(
+    {
+        column: lead.get(column, "")
+        for column in csv_columns
+    }
+    for lead in filtered_leads
+)
 
     st.download_button(
         "Download Filtered Leads (CSV)",
@@ -390,7 +433,9 @@ def render_dashboard() -> None:
                 st.markdown(f"**Name:** {selected_lead['Name']}")
                 st.markdown(f"**Company:** {selected_lead['Company']}")
                 st.markdown(f"**Industry:** {selected_lead['Industry']}")
-                st.markdown(f"**Company Size:** {str(next((lead.get('company_size', '') for lead in leads if str(lead.get('name', '')).strip() == selected_lead['Name'] and str(lead.get('company', '')).strip() == selected_lead['Company']), '')).strip()}")
+                st.markdown(
+                    f"**Company Size:** {str(next((lead.get('company_size', '') for lead in leads if str(lead.get('name', '')).strip() == selected_lead['Name'] and str(lead.get('company', '')).strip() == selected_lead['Company']), '')).strip()}"
+                )
                 st.markdown(f"**Budget:** {selected_lead['Budget']}")
                 st.markdown(f"**Timeline:** {selected_lead['Timeline']}")
                 st.markdown(f"**Score:** {selected_lead['Score']}")
