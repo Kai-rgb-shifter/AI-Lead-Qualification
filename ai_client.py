@@ -10,7 +10,10 @@ from ollama_client import OllamaClientError, analyze_lead_with_ollama
 
 load_dotenv()
 
-AI_PROVIDER = os.getenv("AI_PROVIDER", "ollama").strip().lower()
+
+def get_ai_provider() -> str:
+    """Return the configured AI provider."""
+    return os.getenv("AI_PROVIDER", "ollama").strip().lower()
 
 
 class AIClientError(RuntimeError):
@@ -22,19 +25,21 @@ def analyze_lead_with_ai(
 ) -> Dict[str, str]:
     """Analyze a lead using the configured AI provider."""
 
-    if AI_PROVIDER == "ollama":
+    provider = get_ai_provider()
+
+    if provider == "ollama":
         try:
             return analyze_lead_with_ollama(form_data)
         except OllamaClientError as exc:
             raise AIClientError(str(exc)) from exc
 
-    if AI_PROVIDER == "gemini":
+    if provider == "gemini":
         try:
             return analyze_lead_with_gemini(form_data)
         except GeminiClientError as exc:
             raise AIClientError(str(exc)) from exc
 
     raise AIClientError(
-        f"Unsupported AI_PROVIDER: {AI_PROVIDER}. "
+        f"Unsupported AI_PROVIDER: {provider}. "
         "Use 'ollama' or 'gemini'."
     )
