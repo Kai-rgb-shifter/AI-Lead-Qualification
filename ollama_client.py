@@ -3,13 +3,26 @@
 from __future__ import annotations
 
 import json
+import os
 from dataclasses import dataclass
 from typing import Any, Dict
 from urllib import error, request
 
 
-OLLAMA_URL = "http://localhost:11434/api/generate"
-MODEL_NAME = "qwen2.5:3b"
+from dotenv import load_dotenv
+
+load_dotenv()
+
+OLLAMA_URL = os.getenv(
+    "OLLAMA_URL",
+    "http://localhost:11434/api/generate",
+)
+
+MODEL_NAME = os.getenv(
+    "OLLAMA_MODEL",
+    "qwen2.5:3b",
+)
+
 
 
 class OllamaClientError(RuntimeError):
