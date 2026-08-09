@@ -13,7 +13,7 @@ import streamlit as st
 from database import get_all_leads, initialize_database, save_lead
 from modules.lead_scoring import analyze_lead
 from n8n_client import send_lead_to_n8n
-from ollama_client import OllamaClientError, analyze_lead_with_ollama
+from ai_client import AIClientError, analyze_lead_with_ai
 
 
 # Configure the Streamlit page for a polished dashboard feel.
@@ -139,7 +139,7 @@ def main() -> None:
 
             try:
                 deterministic_analysis = analyze_lead(form_data)
-                ai_analysis = analyze_lead_with_ollama(
+                ai_analysis = analyze_lead_with_ai(
                     {
                         "score": deterministic_analysis["score"],
                         "category": deterministic_analysis["category"],
@@ -215,7 +215,7 @@ def main() -> None:
 
                 st.success("Lead saved successfully.")
 
-            except OllamaClientError:
+            except AIClientError:
                 st.error(
                     "Ollama is not available right now. Make sure the local server is running at http://localhost:11434 and the qwen2.5:3b model is installed."
                 )
