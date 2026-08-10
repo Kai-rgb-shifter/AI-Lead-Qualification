@@ -3,37 +3,56 @@
 This module is responsible only for sending lead payloads to n8n.
 It does not calculate scores, persist data, or render UI.
 """
+
 from __future__ import annotations
 
-import os
-import json
 import logging
+import os
 from typing import Any, Dict
-from urllib import error, request
 
+import requests
 from dotenv import load_dotenv
 
 load_dotenv()
 
-WEBHOOK_URL = os.getenv("N8N_WEBHOOK_URL")
-
-import json
-import logging
-from typing import Any, Dict
-
-import requests
-
-
 logger = logging.getLogger(__name__)
 
+
+def _get_webhook_url() -> str:
+    """Return the n8n webhook URL from environment variables or Streamlit Secrets."""
+
+    # Local development: read from .env / environment
+    webhook_url = os.getenv("N8N_WEBHOOK_URL", "").strip()
+
+    if webhook_url:
+        return webhook_url
+
+    # Streamlit Cloud: read from Streamlit Secrets
+    try:
+        import streamlit as st
+
+        webhook_url = str(
+            st.secrets.get("N8N_WEBHOOK_URL", "")
+        ).strip()
+
+        return webhook_url
+    except Exception:
+        return ""
 
 
 def send_lead_to_n8n(lead_data: Dict[str, Any]) -> bool:
     """Send a lead payload to the configured n8n webhook.
 
-    Returns True when the request succeeds and False when the webhook is
-    unavailable or returns an unexpected response.
+    Returns True when the request succeeds and False when the webhook
+    is unavailable or returns an unexpected response.
     """
+
+    webhook_url = _get_webhook_url()
+
+    if not webhook_url:
+        logger.error("N8N_WEBHOOK_URL is not configured.")
+        return False
+
     payload = {
         "name": str(lead_data.get("name", "")).strip(),
         "company": str(lead_data.get("company", "")).strip(),
@@ -51,13 +70,16 @@ def send_lead_to_n8n(lead_data: Dict[str, Any]) -> bool:
 
     try:
         response = requests.post(
-            WEBHOOK_URL,
+            webhook_url,
             json=payload,
             timeout=10,
         )
         response.raise_for_status()
         return True
-    except requests.exceptions.RequestException as exc:
-        logger.error("Failed to send lead to n8n webhook: %s", exc)
 
-    return False
+    except requests.exceptions.RequestException as exc:
+        logger.error(
+            "Failed to send lead to n8n webhook: %s",
+            exc,
+        )
+        return False
