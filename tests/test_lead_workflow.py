@@ -1,3 +1,4 @@
+import os
 import sqlite3
 import tempfile
 import unittest
@@ -14,8 +15,15 @@ class LeadWorkflowTests(unittest.TestCase):
         self.addCleanup(self.temp_dir.cleanup)
         self.db_path = Path(self.temp_dir.name) / "leads_test.db"
         self.original_db_path = database.DATABASE_PATH
+        self.original_database_url = os.environ.pop("DATABASE_URL", None)
+
         database.DATABASE_PATH = self.db_path
         self.addCleanup(setattr, database, "DATABASE_PATH", self.original_db_path)
+        self.addCleanup(self._restore_database_url)
+
+    def _restore_database_url(self) -> None:
+        if self.original_database_url is not None:
+            os.environ["DATABASE_URL"] = self.original_database_url
 
     def test_save_lead_persists_company_size_and_requirement(self) -> None:
         lead_data = {
@@ -44,7 +52,7 @@ class LeadWorkflowTests(unittest.TestCase):
         self.assertIsNotNone(row)
         self.assertEqual(row[0], "51-200")
         self.assertEqual(row[1], "We need an AI chatbot")
-
+        
     def test_send_lead_to_n8n_includes_company_size_and_requirement(self) -> None:
         lead_data = {
             "name": "Jane Doe",
