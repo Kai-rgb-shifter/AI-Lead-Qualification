@@ -520,7 +520,7 @@ Example:
 AI_PROVIDER = "gemini"
 
 GEMINI_API_KEY = "your_gemini_api_key"
-GEMINI_MODEL = "gemini-2.5-flash"
+GEMINI_MODEL = "gemini-3.1-flash-lite"
 
 DATABASE_URL = "your_database_url"
 
@@ -628,27 +628,33 @@ Gmail + Google Sheets
 
 # 📸 Screenshots
 
-Add screenshots of the production application here.
+
 
 ## Lead Analyzer
 
-_Add screenshot here._
+![alt text](assets/lead-analyzer.1.png)
+![alt text](assets/lead-analyzer.2.png)
+![alt text](assets/lead-analyzer.3.png)
+
 
 ## Dashboard
 
-_Add screenshot here._
+![alt text](assets/dashboard.1.png)
+![alt text](assets/dashboard.2.png)
+![alt text](assets/dashboard.3.png)
 
 ## n8n Production Workflow
 
-_Add screenshot here._
+![alt text](assets/workflow.png)
 
 ## Gmail Notification
 
-_Add screenshot here._
+![alt text](assets/Gmail.1.png)
+![alt text](assets/Gmail.2.png)
 
 ## Google Sheets
 
-_Add screenshot here._
+![alt text](assets/spreadsheet.png)
 
 ---
 

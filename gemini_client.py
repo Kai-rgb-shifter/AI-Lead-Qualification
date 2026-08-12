@@ -16,7 +16,7 @@ def _get_gemini_config() -> tuple[str, str]:
     model = os.getenv("GEMINI_MODEL", "").strip()
 
     if api_key:
-        return api_key, model or "gemini-2.5-flash"
+         api_key, model or "gemini-2.5-flash"
 
     try:
         import streamlit as st
@@ -29,10 +29,10 @@ def _get_gemini_config() -> tuple[str, str]:
             st.secrets.get("GEMINI_MODEL", "gemini-2.5-flash")
         ).strip()
 
-        return api_key, model or "gemini-2.5-flash"
-
+        return api_key, model or "gemini-3.1-flash-lite"
+    
     except Exception:
-        return "", model or "gemini-2.5-flash"
+        return "", model or "gemini-3.1-flash-lite"
 
 
 class GeminiClientError(RuntimeError):
@@ -45,7 +45,7 @@ def _build_prompt(lead: Dict[str, Any]) -> str:
         "Analyze the lead information provided below.\n\n"
 
         "The lead score and category have already been calculated by our "
-        "scoring system. DO NOT change, recalculate, or question the score "
+        "scoring system. DOreturn NOT change, recalculate, or question the score "
         "or category.\n\n"
 
         "Return ONLY valid JSON using exactly this structure:\n"
