@@ -121,7 +121,7 @@ def main() -> None:
                 ["Website", "Referral", "Cold Outreach", "Partner", "Other"],
             )
 
-            submitted = st.form_submit_button("Analyze Lead", use_container_width=True)
+            submitted = st.form_submit_button("Analyze Lead", width="stretch")
 
         if submitted:
             form_data = {
@@ -305,9 +305,9 @@ def render_dashboard_charts(leads: List[Dict[str, Any]]) -> None:
 
     chart_col_1, chart_col_2 = st.columns(2)
     with chart_col_1:
-        st.plotly_chart(category_figure, use_container_width=True)
+        st.plotly_chart(category_figure, width="stretch")
     with chart_col_2:
-        st.plotly_chart(industry_figure, use_container_width=True)
+        st.plotly_chart(industry_figure, width="stretch")
 
 
 def render_dashboard() -> None:
@@ -377,8 +377,8 @@ def render_dashboard() -> None:
         elif sort_option == "Lowest Score":
          filtered_leads.sort(key=lambda lead: lead["Score"])
 
-    st.dataframe(filtered_leads, use_container_width=True, hide_index=True)
-
+    st.dataframe(filtered_leads, width="stretch", hide_index=True)
+    
     csv_buffer = io.StringIO()
     csv_columns = ["Name", "Company", "Industry", "Budget", "Timeline", "Score", "Category"]
     writer = csv.DictWriter(csv_buffer, fieldnames=csv_columns)
@@ -396,7 +396,7 @@ def render_dashboard() -> None:
         data=csv_buffer.getvalue(),
         file_name="filtered_leads.csv",
         mime="text/csv",
-        use_container_width=True,
+        width="stretch",
     )
 
     st.markdown("### Top Qualified Leads")
