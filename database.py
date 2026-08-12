@@ -16,7 +16,9 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-DATABASE_URL = os.getenv("DATABASE_URL", "").strip()
+def get_database_url() -> str:
+    """Return the configured database URL."""
+    return os.getenv("DATABASE_URL", "").strip()
 DATABASE_PATH = Path(__file__).with_name("leads.db")
 
 
@@ -42,14 +44,14 @@ CREATE TABLE IF NOT EXISTS leads (
 
 def _using_postgres() -> bool:
     """Return True when a PostgreSQL database URL is configured."""
-    return bool(DATABASE_URL)
+    return bool(get_database_url())
 
 
 def _get_postgres_connection():
     """Create a PostgreSQL connection."""
     import psycopg
 
-    return psycopg.connect(DATABASE_URL)
+    return psycopg.connect(get_database_url())
 
 
 def initialize_database() -> None:
