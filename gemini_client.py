@@ -9,8 +9,30 @@ from google import genai
 
 load_dotenv()
 
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
+def _get_gemini_config() -> tuple[str, str]:
+    """Return Gemini configuration from environment or Streamlit Secrets."""
+
+    api_key = os.getenv("GEMINI_API_KEY", "").strip()
+    model = os.getenv("GEMINI_MODEL", "").strip()
+
+    if api_key:
+        return api_key, model or "gemini-2.5-flash"
+
+    try:
+        import streamlit as st
+
+        api_key = str(
+            st.secrets.get("GEMINI_API_KEY", "")
+        ).strip()
+
+        model = str(
+            st.secrets.get("GEMINI_MODEL", "gemini-2.5-flash")
+        ).strip()
+
+        return api_key, model or "gemini-2.5-flash"
+
+    except Exception:
+        return "", model or "gemini-2.5-flash"
 
 
 class GeminiClientError(RuntimeError):
@@ -67,16 +89,18 @@ def analyze_lead_with_gemini(
 ) -> Dict[str, str]:
     """Send deterministic lead scores to Gemini and return AI guidance."""
 
-    if not GEMINI_API_KEY:
+    gemini_api_key, gemini_model = _get_gemini_config()
+
+    if not gemini_api_key:
         raise GeminiClientError(
             "GEMINI_API_KEY is not configured."
         )
 
     try:
-        client = genai.Client(api_key=GEMINI_API_KEY)
+        client = genai.Client(api_key=gemini_api_key)
 
         response = client.models.generate_content(
-            model=GEMINI_MODEL,
+            model=gemini_model,
             contents=_build_prompt(form_data),
             config={
                 "response_mime_type": "application/json",

@@ -13,7 +13,24 @@ load_dotenv()
 
 def get_ai_provider() -> str:
     """Return the configured AI provider."""
-    return os.getenv("AI_PROVIDER", "ollama").strip().lower()
+
+    # Local development: .env / environment variable
+    provider = os.getenv("AI_PROVIDER", "").strip().lower()
+
+    if provider:
+        return provider
+
+    # Streamlit Cloud: Streamlit Secrets
+    try:
+        import streamlit as st
+
+        provider = str(
+            st.secrets.get("AI_PROVIDER", "ollama")
+        ).strip().lower()
+
+        return provider
+    except Exception:
+        return "ollama"
 
 
 class AIClientError(RuntimeError):
