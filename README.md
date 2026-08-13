@@ -122,8 +122,8 @@ Production configuration can be supplied through Streamlit Secrets.
                          ▼                         ▼
                   ┌──────────────┐          ┌──────────────┐
                   │    Gemini    │          │    Ollama    │
-                  │ gemini-2.5   │          │ Qwen 2.5:3b  │
-                  │    -flash    │          │ Local Model  │
+                  |gemini-3.1.   │          │ Qwen 2.5:3b  │
+                  │flash lite    │          │ Local Model  │
                   └──────────────┘          └──────────────┘
                                       │
                                       ▼
@@ -293,7 +293,7 @@ Gemini provides cloud-based AI analysis.
 Default model:
 
 ```text
-gemini-2.5-flash
+gemini-3.1-flash-lite
 ```
 
 Configuration:
@@ -301,7 +301,7 @@ Configuration:
 ```env
 AI_PROVIDER=gemini
 GEMINI_API_KEY=your_api_key
-GEMINI_MODEL=gemini-2.5-flash
+GEMINI_MODEL=gemini-3.1-flash-lite
 ```
 
 ---
@@ -499,7 +499,7 @@ OLLAMA_URL=http://localhost:11434
 MODEL_NAME=qwen2.5:3b
 
 GEMINI_API_KEY=your_gemini_api_key
-GEMINI_MODEL=gemini-2.5-flash
+GEMINI_MODEL=gemini-3.1-flash-lite
 
 DATABASE_URL=your_supabase_database_url
 
